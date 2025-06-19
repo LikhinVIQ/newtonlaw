@@ -1,8 +1,13 @@
-import { lessons, submissions, type Lesson, type InsertLesson, type Submission, type InsertSubmission } from "@shared/schema";
+import { lessons, submissions, users, type Lesson, type InsertLesson, type Submission, type InsertSubmission, type User, type InsertUser } from "@shared/schema";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
 
 export interface IStorage {
+  // User operations
+  getUser(id: string): Promise<User | undefined>;
+  getUserByEmail(email: string): Promise<User | undefined>;
+  createUser(user: InsertUser, passwordHash: string): Promise<User>;
+  
   // Lessons
   getLessons(): Promise<Lesson[]>;
   getLesson(id: number): Promise<Lesson | undefined>;
@@ -19,17 +24,45 @@ export interface IStorage {
 export class MemStorage implements IStorage {
   private lessons: Map<number, Lesson>;
   private submissions: Map<number, Submission>;
+  private users: Map<string, User>;
   private currentLessonId: number;
   private currentSubmissionId: number;
 
   constructor() {
     this.lessons = new Map();
     this.submissions = new Map();
+    this.users = new Map();
     this.currentLessonId = 1;
     this.currentSubmissionId = 1;
     
     // Initialize with Newton's laws
     this.initializeLessons();
+  }
+
+  // User operations
+  async getUser(id: string): Promise<User | undefined> {
+    return this.users.get(id);
+  }
+
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    const userArray = Array.from(this.users.values());
+    return userArray.find(user => user.email === email);
+  }
+
+  async createUser(userData: InsertUser, passwordHash: string): Promise<User> {
+    const user: User = {
+      id: this.users.size + 1,
+      email: userData.email,
+      username: userData.username,
+      firstName: userData.firstName || null,
+      lastName: userData.lastName || null,
+      passwordHash,
+      profileImageUrl: userData.profileImageUrl || null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    this.users.set(user.id.toString(), user);
+    return user;
   }
 
   private initializeLessons() {
@@ -170,6 +203,31 @@ export class MemStorage implements IStorage {
 
 // Database storage implementation
 export class DatabaseStorage implements IStorage {
+  // User operations
+  async getUser(id: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.id, parseInt(id)));
+    return user || undefined;
+  }
+
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.email, email));
+    return user || undefined;
+  }
+
+  async createUser(userData: InsertUser, passwordHash: string): Promise<User> {
+    const [user] = await db
+      .insert(users)
+      .values({
+        email: userData.email,
+        username: userData.username,
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+        passwordHash,
+        profileImageUrl: userData.profileImageUrl,
+      })
+      .returning();
+    return user;
+  }
   async getLessons(): Promise<Lesson[]> {
     const result = await db.select().from(lessons).orderBy(lessons.lawNumber);
     return result;
