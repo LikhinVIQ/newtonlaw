@@ -22,10 +22,10 @@ This is a modern, interactive web application designed to teach Newton's Three L
 - **Error Handling**: Centralized error middleware with structured responses
 
 ### Data Storage Solutions
-- **Database**: PostgreSQL with Neon serverless database
+- **Database**: PostgreSQL with Neon serverless database (active)
 - **ORM**: Drizzle ORM for type-safe database operations
 - **Schema Management**: Drizzle Kit for migrations and schema management
-- **Storage Implementation**: In-memory storage for development with interface for easy database migration
+- **Storage Implementation**: DatabaseStorage class with full persistence
 
 ## Key Components
 
@@ -90,6 +90,10 @@ This is a modern, interactive web application designed to teach Newton's Three L
 
 ## Recent Changes
 
+- **June 19, 2025**: Migrated from in-memory storage to PostgreSQL database
+  - Added persistent data storage for lessons and submissions
+  - Updated API key configuration to use OPENAI_API_KEY_2
+  - Database automatically populated with Newton's Laws content
 - **June 19, 2025**: Fixed student form to dynamically update based on Newton's law being studied
   - First Law: Focus on object state and inertia effects
   - Second Law: Focus on force application and resulting motion

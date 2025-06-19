@@ -1,4 +1,6 @@
 import { lessons, submissions, type Lesson, type InsertLesson, type Submission, type InsertSubmission } from "@shared/schema";
+import { db } from "./db";
+import { eq } from "drizzle-orm";
 
 export interface IStorage {
   // Lessons
@@ -166,4 +168,76 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+// Database storage implementation
+export class DatabaseStorage implements IStorage {
+  async getLessons(): Promise<Lesson[]> {
+    const result = await db.select().from(lessons).orderBy(lessons.lawNumber);
+    return result;
+  }
+
+  async getLesson(id: number): Promise<Lesson | undefined> {
+    const [lesson] = await db.select().from(lessons).where(eq(lessons.id, id));
+    return lesson || undefined;
+  }
+
+  async createLesson(insertLesson: InsertLesson): Promise<Lesson> {
+    const [lesson] = await db
+      .insert(lessons)
+      .values({
+        title: insertLesson.title,
+        lawNumber: insertLesson.lawNumber,
+        theory: insertLesson.theory,
+        examples: insertLesson.examples,
+        completed: insertLesson.completed ?? false
+      })
+      .returning();
+    return lesson;
+  }
+
+  async updateLessonCompletion(id: number, completed: boolean): Promise<Lesson | undefined> {
+    const [lesson] = await db
+      .update(lessons)
+      .set({ completed })
+      .where(eq(lessons.id, id))
+      .returning();
+    return lesson || undefined;
+  }
+
+  async getSubmissions(lessonId: number): Promise<Submission[]> {
+    const result = await db.select().from(submissions).where(eq(submissions.lessonId, lessonId));
+    return result;
+  }
+
+  async getSubmission(id: number): Promise<Submission | undefined> {
+    const [submission] = await db.select().from(submissions).where(eq(submissions.id, id));
+    return submission || undefined;
+  }
+
+  async createSubmission(insertSubmission: InsertSubmission): Promise<Submission> {
+    const [submission] = await db
+      .insert(submissions)
+      .values({
+        lessonId: insertSubmission.lessonId,
+        title: insertSubmission.title,
+        actionForce: insertSubmission.actionForce,
+        reactionForce: insertSubmission.reactionForce,
+        explanation: insertSubmission.explanation,
+        score: null,
+        feedback: null,
+        graded: false
+      })
+      .returning();
+    return submission;
+  }
+
+  async updateSubmissionGrading(id: number, score: number, feedback: any): Promise<Submission | undefined> {
+    const [submission] = await db
+      .update(submissions)
+      .set({ score, feedback, graded: true })
+      .where(eq(submissions.id, id))
+      .returning();
+    return submission || undefined;
+  }
+}
+
+export const storage = new DatabaseStorage();
