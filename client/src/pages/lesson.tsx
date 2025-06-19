@@ -84,9 +84,10 @@ export default function LessonPage() {
           onTabChange={setActiveTab}
         />
         
-        {activeTab === "practice" && !currentSubmission && (
+        {activeTab === "practice" && !currentSubmission && lesson && (
           <StudentForm 
             lessonId={lessonId}
+            lesson={lesson}
             onSubmissionComplete={handleSubmissionComplete}
           />
         )}

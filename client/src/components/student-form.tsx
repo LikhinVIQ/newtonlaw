@@ -13,10 +13,15 @@ import { submitExampleSchema, type SubmitExample, type Submission } from "@share
 
 interface StudentFormProps {
   lessonId: number;
+  lesson: { lawNumber: number; title: string };
   onSubmissionComplete: (submission: Submission) => void;
 }
 
-export default function StudentForm({ lessonId, onSubmissionComplete }: StudentFormProps) {
+export default function StudentForm({ lessonId, lesson, onSubmissionComplete }: StudentFormProps) {
+  // Safety check in case lesson is undefined
+  if (!lesson) {
+    return <div>Loading...</div>;
+  }
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [isDraft, setIsDraft] = useState(false);
@@ -79,8 +84,9 @@ export default function StudentForm({ lessonId, onSubmissionComplete }: StudentF
             Your Turn: Provide Your Own Example
           </h3>
           <p className="text-gray-600 mb-6">
-            Think of a real-world situation that demonstrates Newton's Third Law. 
-            Describe both the action and reaction forces.
+            {lesson.lawNumber === 1 && "Think of a real-world situation that demonstrates Newton's First Law (inertia). Describe what happens when forces are or aren't applied."}
+            {lesson.lawNumber === 2 && "Think of a real-world situation that demonstrates Newton's Second Law (F = ma). Describe how force, mass, and acceleration relate."}
+            {lesson.lawNumber === 3 && "Think of a real-world situation that demonstrates Newton's Third Law. Describe both the action and reaction forces."}
           </p>
 
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -103,12 +109,20 @@ export default function StudentForm({ lessonId, onSubmissionComplete }: StudentF
 
             <div>
               <Label htmlFor="actionForce" className="block text-sm font-medium text-gray-700 mb-2">
-                Describe the Action Force
+                {lesson.lawNumber === 1 && "Describe the Object and Its Initial State"}
+                {lesson.lawNumber === 2 && "Describe the Force Being Applied"}
+                {lesson.lawNumber === 3 && "Describe the Action Force"}
               </Label>
               <Textarea
                 id="actionForce"
                 rows={3}
-                placeholder="What force is being applied and in which direction?"
+                placeholder={
+                  lesson.lawNumber === 1 
+                    ? "What object are you describing? Is it at rest or in motion?"
+                    : lesson.lawNumber === 2 
+                    ? "What force is being applied and in which direction?"
+                    : "What force is being applied and in which direction?"
+                }
                 {...form.register("actionForce")}
                 className="w-full"
               />
@@ -121,12 +135,20 @@ export default function StudentForm({ lessonId, onSubmissionComplete }: StudentF
 
             <div>
               <Label htmlFor="reactionForce" className="block text-sm font-medium text-gray-700 mb-2">
-                Describe the Reaction Force
+                {lesson.lawNumber === 1 && "Describe What Happens Next"}
+                {lesson.lawNumber === 2 && "Describe the Resulting Motion"}
+                {lesson.lawNumber === 3 && "Describe the Reaction Force"}
               </Label>
               <Textarea
                 id="reactionForce"
                 rows={3}
-                placeholder="What is the equal and opposite reaction force?"
+                placeholder={
+                  lesson.lawNumber === 1 
+                    ? "What happens when a force is applied or removed? How does the object respond?"
+                    : lesson.lawNumber === 2 
+                    ? "How does the object accelerate? What affects the acceleration?"
+                    : "What is the equal and opposite reaction force?"
+                }
                 {...form.register("reactionForce")}
                 className="w-full"
               />
@@ -144,7 +166,13 @@ export default function StudentForm({ lessonId, onSubmissionComplete }: StudentF
               <Textarea
                 id="explanation"
                 rows={4}
-                placeholder="Explain how this example demonstrates Newton's Third Law..."
+                placeholder={
+                  lesson.lawNumber === 1 
+                    ? "Explain how this example demonstrates Newton's First Law (inertia)..."
+                    : lesson.lawNumber === 2 
+                    ? "Explain how this example demonstrates Newton's Second Law (F = ma)..."
+                    : "Explain how this example demonstrates Newton's Third Law..."
+                }
                 {...form.register("explanation")}
                 className="w-full"
               />

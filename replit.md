@@ -88,12 +88,13 @@ This is a modern, interactive web application designed to teach Newton's Three L
 - **Modules**: Node.js 20, web server, and PostgreSQL 16 support
 - **Workflows**: Automated development workflow with hot reload
 
-## Changelog
+## Recent Changes
 
-```
-Changelog:
-- June 19, 2025. Initial setup
-```
+- **June 19, 2025**: Fixed student form to dynamically update based on Newton's law being studied
+  - First Law: Focus on object state and inertia effects
+  - Second Law: Focus on force application and resulting motion
+  - Third Law: Focus on action-reaction force pairs
+- **June 19, 2025**: Initial setup of Newton's Laws learning platform with AI grading
 
 ## User Preferences
 
