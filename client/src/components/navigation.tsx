@@ -3,17 +3,17 @@ import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { apiRequest } from "@/lib/queryClient";
-import type { Lesson } from "@shared/schema";
+import type { Topic } from "@shared/schema";
 
 export default function Navigation() {
   const [location] = useLocation();
   const { user } = useAuth();
-  const { data: lessons = [] } = useQuery<Lesson[]>({
-    queryKey: ["/api/lessons"]
+  const { data: topics = [] } = useQuery<Topic[]>({
+    queryKey: ["/api/topics"]
   });
 
-  const completedCount = lessons.filter(lesson => lesson.completed).length;
-  const totalCount = lessons.length;
+  const completedCount = topics.reduce((acc, topic) => acc + topic.completedLessons, 0);
+  const totalCount = topics.reduce((acc, topic) => acc + topic.totalLessons, 0);
 
   const handleLogout = async () => {
     try {
@@ -65,7 +65,7 @@ export default function Navigation() {
           
           <div className="flex items-center space-x-4">
             <div className="bg-secondary/10 text-secondary px-3 py-1 rounded-full text-sm font-medium">
-              Progress: {completedCount}/{totalCount}
+              Progress: {completedCount}/{totalCount} lessons
             </div>
             {user && (
               <div className="flex items-center space-x-3">

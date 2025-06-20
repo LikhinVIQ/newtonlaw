@@ -90,6 +90,12 @@ This is a modern, interactive web application designed to teach Newton's Three L
 
 ## Recent Changes
 
+- **June 20, 2025**: Expanded platform to support multiple physics topics
+  - Added topics system with modular lesson organization  
+  - Implemented magnetism section with 3 comprehensive lessons
+  - Created new topic navigation and dedicated topic pages
+  - Restructured database schema to support multiple subject areas
+  - Updated UI to "Physics Hub" supporting expandable curriculum
 - **June 19, 2025**: Added email/password authentication system
   - User registration and login with secure password hashing
   - Session management with PostgreSQL storage

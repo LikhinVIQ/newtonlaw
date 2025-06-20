@@ -44,6 +44,7 @@ export const submitExampleSchema = insertSubmissionSchema.pick({
 
 export type InsertLesson = z.infer<typeof insertLessonSchema>;
 export type Lesson = typeof lessons.$inferSelect;
+export type Topic = z.infer<typeof topicsSchema>;
 export type InsertSubmission = z.infer<typeof insertSubmissionSchema>;
 export type Submission = typeof submissions.$inferSelect;
 export type SubmitExample = z.infer<typeof submitExampleSchema>;
