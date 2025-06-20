@@ -12,8 +12,7 @@ export default function Navigation() {
     queryKey: ["/api/topics"]
   });
 
-  const completedCount = topics.reduce((acc, topic) => acc + topic.completedLessons, 0);
-  const totalCount = topics.reduce((acc, topic) => acc + topic.totalLessons, 0);
+
 
   const handleLogout = async () => {
     try {
@@ -38,35 +37,24 @@ export default function Navigation() {
             </div>
           </div>
           
-          <nav className="hidden md:flex space-x-8">
-            <Link href="/">
-              <span className={`px-3 py-2 text-sm font-medium transition-colors cursor-pointer ${
-                location === "/" 
-                  ? "text-gray-900 hover:text-primary" 
-                  : "text-gray-600 hover:text-primary"
-              }`}>
-                Overview
-              </span>
-            </Link>
-            {lessons.map((lesson) => (
-              <Link key={lesson.id} href={`/lesson/${lesson.id}`}>
-                <span className={`px-3 py-2 text-sm font-medium transition-colors cursor-pointer ${
-                  location === `/lesson/${lesson.id}` 
-                    ? "text-gray-900 hover:text-primary" 
-                    : "text-gray-600 hover:text-primary"
-                }`}>
-                  {lesson.lawNumber === 1 && "First Law"}
-                  {lesson.lawNumber === 2 && "Second Law"}
-                  {lesson.lawNumber === 3 && "Third Law"}
-                </span>
+          <nav className="hidden md:flex space-x-1">
+            {topics.map((topic) => (
+              <Link 
+                key={topic.id} 
+                href={`/topics/${topic.slug}`}
+                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                  location === `/topics/${topic.slug}` || location.startsWith(`/topics/${topic.slug}`)
+                    ? 'bg-primary/10 text-primary' 
+                    : 'text-gray-600 hover:text-primary hover:bg-primary/5'
+                }`}
+              >
+                <span className="mr-1">{topic.icon}</span>
+                {topic.name.split(' ').slice(0, 2).join(' ')}
               </Link>
             ))}
           </nav>
           
           <div className="flex items-center space-x-4">
-            <div className="bg-secondary/10 text-secondary px-3 py-1 rounded-full text-sm font-medium">
-              Progress: {completedCount}/{totalCount} lessons
-            </div>
             {user && (
               <div className="flex items-center space-x-3">
                 <span className="text-sm text-gray-600">

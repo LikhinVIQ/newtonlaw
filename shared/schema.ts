@@ -2,13 +2,23 @@ import { pgTable, text, serial, integer, boolean, jsonb, varchar, timestamp, ind
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
+export const topics = pgTable("topics", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  slug: text("slug").unique().notNull(),
+  description: text("description").notNull(),
+  icon: text("icon").notNull(),
+  order: integer("order").notNull(),
+});
+
 export const lessons = pgTable("lessons", {
   id: serial("id").primaryKey(),
+  topicId: integer("topic_id").references(() => topics.id).notNull(),
   title: text("title").notNull(),
-  lawNumber: integer("law_number").notNull(),
+  lessonNumber: integer("lesson_number").notNull(),
   theory: text("theory").notNull(),
-  examples: jsonb("examples").notNull(),
-  completed: boolean("completed").notNull().default(false),
+  examples: jsonb("examples").notNull().$type<Array<{ title: string; description: string }>>(),
+  completed: boolean("completed").default(false),
 });
 
 export const submissions = pgTable("submissions", {
@@ -23,8 +33,13 @@ export const submissions = pgTable("submissions", {
   graded: boolean("graded").notNull().default(false),
 });
 
+export const insertTopicSchema = createInsertSchema(topics).omit({
+  id: true,
+});
+
 export const insertLessonSchema = createInsertSchema(lessons).omit({
   id: true,
+  completed: true,
 });
 
 export const insertSubmissionSchema = createInsertSchema(submissions).omit({
@@ -42,9 +57,10 @@ export const submitExampleSchema = insertSubmissionSchema.pick({
   explanation: true,
 });
 
+export type InsertTopic = z.infer<typeof insertTopicSchema>;
+export type Topic = typeof topics.$inferSelect;
 export type InsertLesson = z.infer<typeof insertLessonSchema>;
 export type Lesson = typeof lessons.$inferSelect;
-export type Topic = z.infer<typeof topicsSchema>;
 export type InsertSubmission = z.infer<typeof insertSubmissionSchema>;
 export type Submission = typeof submissions.$inferSelect;
 export type SubmitExample = z.infer<typeof submitExampleSchema>;
