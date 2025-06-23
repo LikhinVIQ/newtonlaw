@@ -5,8 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useAuth } from "@/hooks/useAuth";
 import Landing from "@/pages/landing";
-import Topics from "@/pages/topics";
-import Topic from "@/pages/topic";
+import Home from "@/pages/home";
 import Lesson from "@/pages/lesson";
 import NotFound from "@/pages/not-found";
 
@@ -19,8 +18,7 @@ function Router() {
         <Route path="/" component={Landing} />
       ) : (
         <>
-          <Route path="/" component={Topics} />
-          <Route path="/topics/:topic" component={Topic} />
+          <Route path="/" component={Home} />
           <Route path="/lesson/:id" component={Lesson} />
         </>
       )}

@@ -1,4 +1,4 @@
-import { lessons, submissions, users, type Lesson, type InsertLesson, type Submission, type InsertSubmission, type User, type InsertUser, type Topic } from "@shared/schema";
+import { lessons, submissions, users, type Lesson, type InsertLesson, type Submission, type InsertSubmission, type User, type InsertUser } from "@shared/schema";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
 
@@ -8,9 +8,7 @@ export interface IStorage {
   getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser, passwordHash: string): Promise<User>;
   
-  // Topics and Lessons
-  getTopics(): Promise<Topic[]>;
-  getLessonsByTopic(topic: string): Promise<Lesson[]>;
+  // Lessons
   getLessons(): Promise<Lesson[]>;
   getLesson(id: number): Promise<Lesson | undefined>;
   createLesson(lesson: InsertLesson): Promise<Lesson>;
@@ -24,25 +22,21 @@ export interface IStorage {
 }
 
 export class MemStorage implements IStorage {
-  private topics: Map<number, Topic>;
   private lessons: Map<number, Lesson>;
   private submissions: Map<number, Submission>;
   private users: Map<string, User>;
-  private currentTopicId: number;
   private currentLessonId: number;
   private currentSubmissionId: number;
 
   constructor() {
-    this.topics = new Map();
     this.lessons = new Map();
     this.submissions = new Map();
     this.users = new Map();
-    this.currentTopicId = 1;
     this.currentLessonId = 1;
     this.currentSubmissionId = 1;
     
-    // Initialize with physics topics
-    this.initializeData();
+    // Initialize with Newton's laws
+    this.initializeLessons();
   }
 
   // User operations
@@ -145,36 +139,8 @@ export class MemStorage implements IStorage {
     });
   }
 
-  // Topics
-  async getTopics(): Promise<Topic[]> {
-    return Array.from(this.topics.values()).sort((a, b) => a.order - b.order);
-  }
-
-  async getTopic(id: number): Promise<Topic | undefined> {
-    return this.topics.get(id);
-  }
-
-  async getTopicBySlug(slug: string): Promise<Topic | undefined> {
-    const topicArray = Array.from(this.topics.values());
-    return topicArray.find(topic => topic.slug === slug);
-  }
-
-  async createTopic(insertTopic: InsertTopic): Promise<Topic> {
-    const topic: Topic = {
-      id: this.currentTopicId++,
-      ...insertTopic
-    };
-    this.topics.set(topic.id, topic);
-    return topic;
-  }
-
-  // Lessons
-  async getLessons(topicId?: number): Promise<Lesson[]> {
-    const allLessons = Array.from(this.lessons.values());
-    const filteredLessons = topicId 
-      ? allLessons.filter(lesson => lesson.topicId === topicId)
-      : allLessons;
-    return filteredLessons.sort((a, b) => a.lessonNumber - b.lessonNumber);
+  async getLessons(): Promise<Lesson[]> {
+    return Array.from(this.lessons.values()).sort((a, b) => a.lawNumber - b.lawNumber);
   }
 
   async getLesson(id: number): Promise<Lesson | undefined> {
@@ -262,46 +228,8 @@ export class DatabaseStorage implements IStorage {
       .returning();
     return user;
   }
-  // Topics and Lessons
-  async getTopics(): Promise<Topic[]> {
-    const allLessons = await db.select().from(lessons);
-    const topicGroups = allLessons.reduce((acc, lesson) => {
-      if (!acc[lesson.topic]) {
-        acc[lesson.topic] = [];
-      }
-      acc[lesson.topic].push(lesson);
-      return acc;
-    }, {} as Record<string, Lesson[]>);
-
-    const topics: Topic[] = [
-      {
-        id: "newton-laws",
-        title: "Newton's Laws of Motion",
-        description: "Fundamental principles governing motion and forces in physics",
-        totalLessons: topicGroups["newton-laws"]?.length || 0,
-        completedLessons: topicGroups["newton-laws"]?.filter(l => l.completed).length || 0
-      },
-      {
-        id: "magnetism",
-        title: "Magnetism",
-        description: "Study magnetic forces, fields, and electromagnetic phenomena",
-        totalLessons: topicGroups["magnetism"]?.length || 0,
-        completedLessons: topicGroups["magnetism"]?.filter(l => l.completed).length || 0
-      }
-    ];
-
-    return topics;
-  }
-
-  async getLessonsByTopic(topic: string): Promise<Lesson[]> {
-    const result = await db.select().from(lessons)
-      .where(eq(lessons.topic, topic))
-      .orderBy(lessons.orderIndex);
-    return result;
-  }
-
   async getLessons(): Promise<Lesson[]> {
-    const result = await db.select().from(lessons).orderBy(lessons.topic, lessons.orderIndex);
+    const result = await db.select().from(lessons).orderBy(lessons.lawNumber);
     return result;
   }
 
