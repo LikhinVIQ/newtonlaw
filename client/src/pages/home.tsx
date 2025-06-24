@@ -4,8 +4,9 @@ import ProgressStepper from "@/components/progress-stepper";
 import LawCard from "@/components/law-card";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { Lesson } from "@shared/schema";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import Simulation from "@/components/simulationm";
+import Simulation2 from "@/components/simulation2";
+import SimulationF from "@/components/simulationf";
 
 export default function Home() {
   const { data: lessons = [], isLoading } = useQuery<Lesson[]>({
@@ -68,15 +69,12 @@ export default function Home() {
             ))}
         </section>
 
-        <div className="text-center mt-12">
-          <Link href="/simulation">
-            <Button className="text-white bg-primary hover:bg-primary/90 text-lg px-6 py-3 rounded-full">
-              Launch Simulation
-            </Button>
-          </Link>
-        </div>
-
-        
+        {/* Simulation */}
+        <section>
+          <Simulation2 />
+          <Simulation />
+          <SimulationF />
+        </section>
       </main>
     </div>
   );

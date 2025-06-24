@@ -13,7 +13,7 @@ interface Ball {
 
 const RESTITUTION = 0.8;
 
-export default function Simulation() {
+export default function Simulation2() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationRef = useRef<number>();
   const lastTimeRef = useRef<number>(0);
