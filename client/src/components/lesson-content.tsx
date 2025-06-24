@@ -2,7 +2,9 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { Lesson } from "@shared/schema";
+import type { QuizQuestion } from "@shared/quiz-types";
 import { EXAMPLE_IMAGES } from "@/lib/constants";
+import QuizComponent from "./quiz-component";
 
 interface LessonContentProps {
   lesson: Lesson;
@@ -19,6 +21,7 @@ export default function LessonContent({ lesson, onTabChange }: LessonContentProp
   
   const exampleImage = EXAMPLE_IMAGES[lesson.lawNumber as keyof typeof EXAMPLE_IMAGES];
   const examples = Array.isArray(lesson.examples) ? lesson.examples : [];
+  const quizQuestions = Array.isArray(lesson.quizQuestions) ? lesson.quizQuestions as QuizQuestion[] : [];
   
   return (
     <section className="bg-white rounded-xl shadow-md border border-gray-200 p-8 mb-8">
@@ -36,9 +39,10 @@ export default function LessonContent({ lesson, onTabChange }: LessonContentProp
       </div>
 
       <Tabs value={activeTab} onValueChange={handleTabChange}>
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="theory">Theory</TabsTrigger>
           <TabsTrigger value="examples">Real-World Examples</TabsTrigger>
+          <TabsTrigger value="quiz">Quiz</TabsTrigger>
           <TabsTrigger value="practice">Your Example</TabsTrigger>
         </TabsList>
 
@@ -163,6 +167,19 @@ export default function LessonContent({ lesson, onTabChange }: LessonContentProp
               ))}
             </div>
           </div>
+        </TabsContent>
+
+        <TabsContent value="quiz" className="mt-6">
+          {quizQuestions.length > 0 ? (
+            <QuizComponent
+              questions={quizQuestions}
+              lessonTitle={lesson.title}
+            />
+          ) : (
+            <div className="text-center py-8">
+              <p className="text-gray-600">Quiz questions are being prepared for this lesson.</p>
+            </div>
+          )}
         </TabsContent>
 
         <TabsContent value="practice" className="mt-6">
