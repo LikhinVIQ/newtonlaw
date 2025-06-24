@@ -4,10 +4,12 @@ import ProgressStepper from "@/components/progress-stepper";
 import LawCard from "@/components/law-card";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { Lesson } from "@shared/schema";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 export default function Home() {
   const { data: lessons = [], isLoading } = useQuery<Lesson[]>({
-    queryKey: ["/api/lessons"]
+    queryKey: ["/api/lessons"],
   });
 
   if (isLoading) {
@@ -28,7 +30,7 @@ export default function Home() {
               ))}
             </div>
           </div>
-          
+
           <div className="grid md:grid-cols-3 gap-8">
             {[1, 2, 3].map((i) => (
               <Skeleton key={i} className="h-64 rounded-xl" />
@@ -42,7 +44,7 @@ export default function Home() {
   return (
     <div className="bg-neutral min-h-screen font-body text-dark">
       <Navigation />
-      
+
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Hero Section */}
         <section className="text-center mb-12">
@@ -50,10 +52,10 @@ export default function Home() {
             Master Newton's Three Laws of Motion
           </h2>
           <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-            Interactive lessons combining theory with real-world examples, 
-            plus AI-powered assessment of your understanding.
+            Interactive lessons combining theory with real-world examples, plus
+            AI-powered assessment of your understanding.
           </p>
-          
+
           <ProgressStepper lessons={lessons} />
         </section>
 
@@ -65,6 +67,16 @@ export default function Home() {
               <LawCard key={lesson.id} lesson={lesson} />
             ))}
         </section>
+
+        <div className="text-center mt-12">
+          <Link href="/simulation">
+            <Button className="text-white bg-primary hover:bg-primary/90 text-lg px-6 py-3 rounded-full">
+              Launch Simulation
+            </Button>
+          </Link>
+        </div>
+
+        
       </main>
     </div>
   );
