@@ -8,6 +8,7 @@ export const lessons = pgTable("lessons", {
   lawNumber: integer("law_number").notNull(),
   theory: text("theory").notNull(),
   examples: jsonb("examples").notNull(),
+  quizQuestions: jsonb("quiz_questions").notNull(),
   completed: boolean("completed").notNull().default(false),
 });
 
